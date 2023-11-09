@@ -1,0 +1,18 @@
+# Maven target directory
+/target/
+
+# IDE-specific files and directories
+/.classpath
+/.project
+/.settings/
+
+# Compiled Java classes
+**/*.class
+
+# IntelliJ IDEA files
+.idea/
+
+# Eclipse files
+.classpath
+.project
+.settings/
