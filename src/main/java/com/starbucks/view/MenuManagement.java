@@ -5,6 +5,7 @@ import java.util.Arrays;
 import com.starbucks.model.Menu;
 import com.starbucks.model.MenuItem;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -14,6 +15,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -132,8 +134,66 @@ public class MenuManagement {
 		return button;
 	}
 
+	// Shows a dialog for adding a new menu item
 	private void showAddItemDialog() {
-		// TODO
+		// Creating a new dialog window for adding menu items
+		Dialog<MenuItem> dialog = new Dialog<>();
+		dialog.setTitle("Add New Menu Item");
+
+		// Setting up the dialog pane with OK and Cancel buttons
+		DialogPane dialogPane = dialog.getDialogPane();
+		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+		// Creating text fields for name, price, and description inputs
+		TextField nameField = new TextField();
+		TextField priceField = new TextField();
+		TextField descField = new TextField();
+
+		GridPane grid = new GridPane();
+		grid.add(new Label("Name:"), 0, 0);
+		grid.add(nameField, 1, 0);
+		grid.add(new Label("Price:"), 0, 1);
+		grid.add(priceField, 1, 1);
+		grid.add(new Label("Description:"), 0, 2);
+		grid.add(descField, 1, 2);
+		dialogPane.setContent(grid);
+
+		// The behavior of the OK button
+		Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+		okButton.addEventFilter(ActionEvent.ACTION, event -> {
+			try {
+				String name = nameField.getText().trim();
+				String description = descField.getText().trim();
+				String priceText = priceField.getText().trim();
+
+				// Check if any field is empty and show an error if so
+				if (name.isEmpty() || description.isEmpty() || priceText.isEmpty()) {
+					showAlert("Validation Error", "Name, price, and description cannot be empty.");
+					event.consume();
+					return;
+				}
+
+				// Try to parse the price and create a new menu item
+				double price = Double.parseDouble(priceText);
+				MenuItem newItem = new MenuItem(name, price, description);
+				
+				// Add the item to the menu
+				menu.addItem(newItem);
+				tableView.getItems().add(newItem);
+				dialog.close();
+			} catch (NumberFormatException e) {
+				// Show an error if the price is not a valid number
+				showAlert("Error", "Price must be a valid number.");
+				event.consume();
+			} catch (NullPointerException | IllegalArgumentException e) {
+				 // Show an error if there's a problem with the item data
+				showAlert("Error", e.getMessage());
+				event.consume();
+			}
+		});
+
+		// Show the dialog and wait for user input
+		dialog.showAndWait();
 	}
 
 	private void showUpdateItemDialog() {
@@ -142,5 +202,14 @@ public class MenuManagement {
 
 	private void removeSelectedItem() {
 		// TODO
+	}
+	
+	// Displays an error alert dialog with a specified title and message
+	private void showAlert(String title, String message) {
+		Alert alert = new Alert(Alert.AlertType.ERROR);
+		alert.setTitle(title);
+		alert.setHeaderText(null);
+		alert.setContentText(message);
+		alert.showAndWait();
 	}
 }
