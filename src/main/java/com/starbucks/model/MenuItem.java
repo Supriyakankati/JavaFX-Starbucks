@@ -11,19 +11,19 @@ public class MenuItem {
 		this.description = description;
 	}
 
-	public String getName() {
+	public String getItemName() {
 		return itemName;
 	}
 
-	public void setName(String itemName) {
+	public void setItemName(String itemName) {
 		this.itemName = itemName;
 	}
 
-	public double getPrice() {
+	public double getItemPrice() {
 		return itemPrice;
 	}
 
-	public void setPrice(double itemPrice) {
+	public void setItemPrice(double itemPrice) {
 		this.itemPrice = itemPrice;
 	}
 
