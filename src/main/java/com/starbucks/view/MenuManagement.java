@@ -153,18 +153,35 @@ public class MenuManagement {
 
 	// Shows a dialog for adding a new menu item
 	private void showAddItemDialog() {
-		// Creating a new dialog window for adding menu items
+		showItemDialog(false);
+	}
+
+	private void showUpdateItemDialog() {
+		if (selectedItem == null) {
+			showAlert("No Selection", "Please select an item to update.");
+			return;
+		}
+		showItemDialog(true);
+	}
+
+	private void removeSelectedItem() {
+		// TODO
+	}
+	
+	// Shows a dialog for adding or updating a menu item
+	private void showItemDialog(boolean isUpdate) {
+		// Creating a new dialog window based on isUpdate flag
 		Dialog<MenuItem> dialog = new Dialog<>();
-		dialog.setTitle("Add New Menu Item");
+		dialog.setTitle(isUpdate ? "Update Menu Item" : "Add New Menu Item");
 
 		// Setting up the dialog pane with OK and Cancel buttons
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-		// Creating text fields for name, price, and description inputs
-		TextField nameField = new TextField();
-		TextField priceField = new TextField();
-		TextField descField = new TextField();
+		// Pre-fill the text fields if updating, else start with empty fields
+		TextField nameField = new TextField(isUpdate ? selectedItem.getItemName() : "");
+		TextField priceField = new TextField(isUpdate ? String.valueOf(selectedItem.getItemPrice()) : "");
+		TextField descField = new TextField(isUpdate ? selectedItem.getDescription() : "");
 
 		GridPane grid = new GridPane();
 		grid.add(new Label("Name:"), 0, 0);
@@ -190,35 +207,34 @@ public class MenuManagement {
 					return;
 				}
 
-				// Try to parse the price and create a new menu item
+				// Parse price and ensure it's a valid number
 				double price = Double.parseDouble(priceText);
+
+				// Create new MenuItem or update existing based on isUpdate flag
 				MenuItem newItem = new MenuItem(name, price, description);
-				
-				// Add the item to the menu
-				menu.addItem(newItem);
-				tableView.getItems().add(newItem);
+				if (isUpdate) {
+					// Update the existing item in the menu and table view
+					menu.updateItem(selectedItem.getItemName(), newItem);
+					int index = tableView.getItems().indexOf(selectedItem);
+					tableView.getItems().set(index, newItem);
+				} else {
+					// Add the new item to the menu and table view
+					menu.addItem(newItem);
+					tableView.getItems().add(newItem);
+				}
 				dialog.close();
 			} catch (NumberFormatException e) {
 				// Show an error if the price is not a valid number
 				showAlert("Error", "Price must be a valid number.");
 				event.consume();
 			} catch (NullPointerException | IllegalArgumentException e) {
-				 // Show an error if there's a problem with the item data
+				// Show an error if there's a problem with the item data
 				showAlert("Error", e.getMessage());
 				event.consume();
 			}
 		});
 
-		// Show the dialog and wait for user input
 		dialog.showAndWait();
-	}
-
-	private void showUpdateItemDialog() {
-		// TODO
-	}
-
-	private void removeSelectedItem() {
-		// TODO
 	}
 	
 	// Displays an error alert dialog with a specified title and message
