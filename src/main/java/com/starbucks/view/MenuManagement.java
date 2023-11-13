@@ -34,6 +34,13 @@ public class MenuManagement {
 	private final Scene mainScene;
 	
 	private TableView<MenuItem> tableView = new TableView<>();
+	
+	private Button updateButton;
+	
+	private Button removeButton;
+	
+	// Store the selected item
+	private MenuItem selectedItem;
 
 	// Constructor to initialize the menu management
 	public MenuManagement(Stage primaryStage, Menu menu) {
@@ -85,6 +92,16 @@ public class MenuManagement {
 
 		tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		tableView.setPadding(new Insets(10, 10, 10, 10));
+		
+		// Adding listener to enable update and remove buttons when an item is selected
+		tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+			// Update the selectedItem with the currently selected item
+			selectedItem = newSelection; 
+			
+			// Enable the buttons
+			updateButton.setDisable(newSelection == null);
+			removeButton.setDisable(newSelection == null);
+		});
 	}
 
 	// Sets up the buttons for menu management operations
@@ -92,11 +109,11 @@ public class MenuManagement {
 		Button addButton = styleButton(new Button("Add Item"));
 		addButton.setOnAction(e -> showAddItemDialog());
 
-		Button updateButton = styleButton(new Button("Update Item"));
-		updateButton.setOnAction(e -> showUpdateItemDialog());
+		updateButton = styleButton(new Button("Update Item"));
+        updateButton.setOnAction(e -> showUpdateItemDialog());
 
-		Button removeButton = styleButton(new Button("Remove Item"));
-		removeButton.setOnAction(e -> removeSelectedItem());
+        removeButton = styleButton(new Button("Remove Item"));
+        removeButton.setOnAction(e -> removeSelectedItem());
 
 		Button backButton = styleButton(new Button("Back"));
 		backButton.setOnAction(e -> primaryStage.setScene(mainScene));
