@@ -31,6 +31,7 @@ public class Main extends Application {
 		this.primaryStage = primaryStage;
 		primaryStage.setTitle("Starbucks Application");
 
+		initializeMenuWithData();
 		showMainView();
 	}
 
@@ -87,6 +88,19 @@ public class Main extends Application {
 
 		return button;
 	}
+	
+	private void initializeMenuWithData() {
+        menu.addItem(new MenuItem("Caffè Americano", 2.95, "Espresso shots topped with hot water for a rich, creamy flavor."));
+        menu.addItem(new MenuItem("Caffè Mocha", 3.45, "Espresso with bittersweet mocha sauce and steamed milk."));
+        menu.addItem(new MenuItem("Cappuccino", 2.95, "Dark, rich espresso under a smoothed and stretched layer of thick milk foam."));
+        menu.addItem(new MenuItem("Espresso", 1.95, "Rich and caramelly espresso in its purest form."));
+        menu.addItem(new MenuItem("Flat White", 3.75, "Smooth ristretto shots of espresso and whole milk."));
+        menu.addItem(new MenuItem("Latte Macchiato", 3.65, "Layered espresso with steamed whole milk, lightly topped with foam."));
+        menu.addItem(new MenuItem("Caramel Macchiato", 3.95, "Freshly steamed milk with vanilla syrup, espresso and caramel drizzle."));
+        menu.addItem(new MenuItem("White Chocolate Mocha", 3.95, "Espresso with white chocolate sauce and steamed milk."));
+        menu.addItem(new MenuItem("Pike Place Roast", 2.45, "Smooth, balanced and rich flavor from our signature blend of coffee."));
+        menu.addItem(new MenuItem("Nitro Cold Brew", 3.95, "Velvety-smooth cold brew with a creamy head of foam."));
+    }
 
 	public static void main(String[] args) {
 		launch(args);
