@@ -156,6 +156,7 @@ public class MenuManagement {
 		showItemDialog(false);
 	}
 
+	// Shows a dialog for updating a menu item
 	private void showUpdateItemDialog() {
 		if (selectedItem == null) {
 			showAlert("No Selection", "Please select an item to update.");
@@ -164,8 +165,42 @@ public class MenuManagement {
 		showItemDialog(true);
 	}
 
+	// Removes the selected item from the menu
 	private void removeSelectedItem() {
-		// TODO
+		if (selectedItem == null) {
+			showAlert("No Selection", "Please select an item to remove.");
+			return;
+		}
+
+		// Confirmation dialog to ensure that the user wants to proceed with removal
+		Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION);
+		confirmationDialog.setTitle("Confirm Removal");
+		confirmationDialog.setHeaderText("Removing Menu Item");
+		confirmationDialog.setContentText("Are you sure you want to remove the selected item: "
+				+ selectedItem.getItemName() + "?");
+
+		// Show the confirmation dialog and wait for user response
+		confirmationDialog.showAndWait().ifPresent(response -> {
+			if (response == ButtonType.OK) {
+				try {
+					// Attempt to remove the item from the menu
+					menu.removeItem(selectedItem.getItemName());
+
+					// Remove the item from the TableView
+					tableView.getItems().remove(selectedItem);
+
+					// Reset the selectedItem as it's no longer in the list
+					selectedItem = null;
+
+					// Disable the update and remove buttons as there's no selection
+					updateButton.setDisable(true);
+					removeButton.setDisable(true);
+				} catch (IllegalArgumentException e) {
+					// Show an error if removal fails
+					showAlert("Error", e.getMessage());
+				}
+			}
+		});
 	}
 	
 	// Shows a dialog for adding or updating a menu item
