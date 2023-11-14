@@ -1,7 +1,9 @@
 package com.starbucks.application;
 
 import com.starbucks.model.Menu;
+import com.starbucks.model.MenuItem;
 import com.starbucks.view.MenuManagement;
+import com.starbucks.view.OrderManagement;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -41,6 +43,7 @@ public class Main extends Application {
 
 		Button customerButton = styleButton(new Button("CUSTOMER"));
 		customerButton.setPrefSize(150, 50);
+		customerButton.setOnAction(e -> showOrderManagementView());
 
 		HBox hBox = new HBox(10);
 		hBox.setAlignment(Pos.CENTER);
@@ -57,6 +60,12 @@ public class Main extends Application {
 		MenuManagement menuManagement = new MenuManagement(primaryStage, menu);
 		Scene menuManagementScene = menuManagement.createMenuManagementScene();
 		primaryStage.setScene(menuManagementScene);
+	}
+	
+	private void showOrderManagementView() {
+		OrderManagement orderManagement = new OrderManagement(primaryStage, menu);
+		Scene orderManagementScene = orderManagement.createOrderManagementScene();
+		primaryStage.setScene(orderManagementScene);
 	}
 
 	// Sets the background color, text color, font, and size of the button
