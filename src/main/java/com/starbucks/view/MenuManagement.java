@@ -11,34 +11,30 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
-public class MenuManagement {
+public class MenuManagement extends BaseView {
 
 	// Menu containing all the items
 	private final Menu menu;
-	
+
 	private final Stage primaryStage;
-	
+
 	// Main scene to return to from menu management
 	private final Scene mainScene;
-	
+
 	private TableView<MenuItem> tableView = new TableView<>();
-	
+
 	private Button updateButton;
-	
+
 	private Button removeButton;
-	
+
 	// Store the selected item
 	private MenuItem selectedItem;
 
@@ -73,7 +69,8 @@ public class MenuManagement {
 		return new Scene(root, 600, 400);
 	}
 
-	// Sets up the TableView with columns for menu item name, price, and description.
+	// Sets up the TableView with columns for menu item name, price, and
+	// description.
 	private void setupTableView() {
 		TableColumn<MenuItem, String> nameColumn = new TableColumn<>("Name");
 		nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
@@ -86,18 +83,18 @@ public class MenuManagement {
 
 		// Adding columns to the TableView
 		tableView.getColumns().addAll(Arrays.asList(nameColumn, priceColumn, descColumn));
-		
+
 		// Populate the TableView with menu items
 		tableView.setItems(FXCollections.observableArrayList(menu.getItems()));
 
 		tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		tableView.setPadding(new Insets(10, 10, 10, 10));
-		
+
 		// Adding listener to enable update and remove buttons when an item is selected
 		tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
 			// Update the selectedItem with the currently selected item
-			selectedItem = newSelection; 
-			
+			selectedItem = newSelection;
+
 			// Enable the buttons
 			updateButton.setDisable(newSelection == null);
 			removeButton.setDisable(newSelection == null);
@@ -110,10 +107,10 @@ public class MenuManagement {
 		addButton.setOnAction(e -> showAddItemDialog());
 
 		updateButton = styleButton(new Button("Update Item"));
-        updateButton.setOnAction(e -> showUpdateItemDialog());
+		updateButton.setOnAction(e -> showUpdateItemDialog());
 
-        removeButton = styleButton(new Button("Remove Item"));
-        removeButton.setOnAction(e -> removeSelectedItem());
+		removeButton = styleButton(new Button("Remove Item"));
+		removeButton.setOnAction(e -> removeSelectedItem());
 
 		Button backButton = styleButton(new Button("Back"));
 		backButton.setOnAction(e -> primaryStage.setScene(mainScene));
@@ -128,29 +125,6 @@ public class MenuManagement {
 		return buttonBox;
 	}
 
-	private Button styleButton(Button button) {
-		// Starbucks green color
-	    Color starbucksGreen = Color.rgb(0, 150, 57);
-		
-		// Set background color
-		BackgroundFill backgroundFill = new BackgroundFill(starbucksGreen, new CornerRadii(5), Insets.EMPTY);
-		Background background = new Background(backgroundFill);
-		button.setBackground(background);
-
-		// Set text color
-		button.setTextFill(Color.BLACK);
-
-		// Set font to bold
-		Font fontBold = Font.font("Arial", FontWeight.BOLD, 12);
-		button.setFont(fontBold);
-
-		// Set button size and padding
-		button.setPadding(new Insets(5, 10, 5, 10));
-		button.setPrefSize(120, 20);
-
-		return button;
-	}
-
 	// Shows a dialog for adding a new menu item
 	private void showAddItemDialog() {
 		showItemDialog(false);
@@ -159,7 +133,7 @@ public class MenuManagement {
 	// Shows a dialog for updating a menu item
 	private void showUpdateItemDialog() {
 		if (selectedItem == null) {
-			showAlert("No Selection", "Please select an item to update.");
+			showAlert("No Selection", "Please select an item to update.", Alert.AlertType.ERROR);
 			return;
 		}
 		showItemDialog(true);
@@ -168,7 +142,7 @@ public class MenuManagement {
 	// Removes the selected item from the menu
 	private void removeSelectedItem() {
 		if (selectedItem == null) {
-			showAlert("No Selection", "Please select an item to remove.");
+			showAlert("No Selection", "Please select an item to remove.", Alert.AlertType.ERROR);
 			return;
 		}
 
@@ -176,8 +150,8 @@ public class MenuManagement {
 		Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION);
 		confirmationDialog.setTitle("Confirm Removal");
 		confirmationDialog.setHeaderText("Removing Menu Item");
-		confirmationDialog.setContentText("Are you sure you want to remove the selected item: "
-				+ selectedItem.getItemName() + "?");
+		confirmationDialog.setContentText(
+				"Are you sure you want to remove the selected item: " + selectedItem.getItemName() + "?");
 
 		// Show the confirmation dialog and wait for user response
 		confirmationDialog.showAndWait().ifPresent(response -> {
@@ -197,12 +171,12 @@ public class MenuManagement {
 					removeButton.setDisable(true);
 				} catch (IllegalArgumentException e) {
 					// Show an error if removal fails
-					showAlert("Error", e.getMessage());
+					showAlert("Error", e.getMessage(), Alert.AlertType.ERROR);
 				}
 			}
 		});
 	}
-	
+
 	// Shows a dialog for adding or updating a menu item
 	private void showItemDialog(boolean isUpdate) {
 		// Creating a new dialog window based on isUpdate flag
@@ -237,7 +211,8 @@ public class MenuManagement {
 
 				// Check if any field is empty and show an error if so
 				if (name.isEmpty() || description.isEmpty() || priceText.isEmpty()) {
-					showAlert("Validation Error", "Name, price, and description cannot be empty.");
+					showAlert("Validation Error", "Name, price, and description cannot be empty.",
+							Alert.AlertType.ERROR);
 					event.consume();
 					return;
 				}
@@ -260,24 +235,15 @@ public class MenuManagement {
 				dialog.close();
 			} catch (NumberFormatException e) {
 				// Show an error if the price is not a valid number
-				showAlert("Error", "Price must be a valid number.");
+				showAlert("Error", "Price must be a valid number.", Alert.AlertType.ERROR);
 				event.consume();
 			} catch (NullPointerException | IllegalArgumentException e) {
 				// Show an error if there's a problem with the item data
-				showAlert("Error", e.getMessage());
+				showAlert("Error", e.getMessage(), Alert.AlertType.ERROR);
 				event.consume();
 			}
 		});
 
 		dialog.showAndWait();
-	}
-	
-	// Displays an error alert dialog with a specified title and message
-	private void showAlert(String title, String message) {
-		Alert alert = new Alert(Alert.AlertType.ERROR);
-		alert.setTitle(title);
-		alert.setHeaderText(null);
-		alert.setContentText(message);
-		alert.showAndWait();
 	}
 }
