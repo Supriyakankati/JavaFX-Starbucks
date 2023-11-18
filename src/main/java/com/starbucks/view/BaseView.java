@@ -45,4 +45,9 @@ public class BaseView {
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
+	
+	// Helper method to format price values
+	protected String formatPrice(double price) {
+		return String.format("%.2f", price);
+	}
 }

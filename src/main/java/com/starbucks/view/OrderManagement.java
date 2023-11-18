@@ -220,7 +220,7 @@ public class OrderManagement extends BaseView {
 	}
 
 	private void processOrder() {
-		OrderProcessing orderProcessing = new OrderProcessing(primaryStage, currentOrder);
+		OrderProcessing orderProcessing = new OrderProcessing(primaryStage, currentOrder, this);
 		Scene orderProcessingScene = orderProcessing.createOrderProcessingScene();
 		primaryStage.setScene(orderProcessingScene);
 	}
@@ -239,6 +239,14 @@ public class OrderManagement extends BaseView {
 	            processOrderButton.setDisable(currentOrder.getOrderItems().isEmpty());
 			}
 		});
+	}
+	
+	// Method to reset the order and TableView
+	public void resetOrderManagement() {
+		this.currentOrder = new Order(); // Reset the current order
+		orderTableView.setItems(FXCollections.observableArrayList(currentOrder.getOrderItems())); // Clear the TableView
+		updateTotalCost(); // Update the total cost label
+		processOrderButton.setDisable(true); // Disable the process order button
 	}
 	
 	private Label createHeaderLabel(String text) {

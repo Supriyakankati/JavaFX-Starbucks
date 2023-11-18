@@ -22,14 +22,13 @@ public class OrderProcessing extends BaseView {
 	// Store the current order
 	private final Order currentOrder;
 	
-	// Order Management scene to return to from Order Processing
-	private final Scene orderManagementScene;
+	private final OrderManagement orderManagement;
 
 	// Constructor to initialize the order processing
-	public OrderProcessing(Stage primaryStage, Order currentOrder) {
+	public OrderProcessing(Stage primaryStage, Order currentOrder, OrderManagement orderManagement) {
 		this.primaryStage = primaryStage;
-		this.orderManagementScene = primaryStage.getScene();
 		this.currentOrder = currentOrder;
+		this.orderManagement = orderManagement;
 	}
 
 	// Creates and returns the scene for order processing
@@ -80,10 +79,10 @@ public class OrderProcessing extends BaseView {
 
 		// Create buttons for navigation and payment
 		Button backButton = styleButton(new Button("Back"));
-		backButton.setOnAction(e -> primaryStage.setScene(orderManagementScene));
+		backButton.setOnAction(e -> primaryStage.setScene(orderManagement.createOrderManagementScene()));
 
 		Button paymentButton = styleButton(new Button("Pay"));
-		// TODO: Implement payment functionality
+		paymentButton.setOnAction(e -> handlePayment());
 
 		// Setup the button box
 		HBox buttonBox = new HBox(10, backButton, paymentButton);
@@ -93,9 +92,10 @@ public class OrderProcessing extends BaseView {
 
 		return new Scene(root, 600, 400);
 	}
-
-	// Helper method to format price values
-	private String formatPrice(double price) {
-		return String.format("%.2f", price);
+	
+	private void handlePayment() {
+		PaymentHandler paymentHandler = new PaymentHandler(primaryStage, currentOrder, orderManagement);
+		Scene paymentHandlerScene = paymentHandler.createPaymentHandlerScene();
+		primaryStage.setScene(paymentHandlerScene);
 	}
 }
