@@ -6,6 +6,7 @@ import com.starbucks.model.Menu;
 import com.starbucks.model.MenuItem;
 import com.starbucks.model.Order;
 import com.starbucks.model.OrderItem;
+import com.starbucks.utils.DecimalFormatCellFactory;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -101,6 +102,7 @@ public class OrderManagement extends BaseView {
 
 		TableColumn<MenuItem, Double> priceColumn = new TableColumn<>("Price");
 		priceColumn.setCellValueFactory(new PropertyValueFactory<>("itemPrice"));
+		priceColumn.setCellFactory(new DecimalFormatCellFactory<>(2));
 
 		TableColumn<MenuItem, String> descColumn = new TableColumn<>("Description");
 		descColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -124,13 +126,15 @@ public class OrderManagement extends BaseView {
 		TableColumn<OrderItem, Double> itemPriceColumn = new TableColumn<>("Item Price");
 		itemPriceColumn.setCellValueFactory(
 				cellData -> new SimpleDoubleProperty(cellData.getValue().getMenuItem().getItemPrice()).asObject());
-
+		itemPriceColumn.setCellFactory(new DecimalFormatCellFactory<>(2));
+		
 		TableColumn<OrderItem, Integer> quantityColumn = new TableColumn<>("Quantity");
 		quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
 		TableColumn<OrderItem, Double> totalPriceColumn = new TableColumn<>("Total Price");
 		totalPriceColumn.setCellValueFactory(
 				cellData -> new SimpleDoubleProperty(cellData.getValue().calculateItemPrice()).asObject());
+		totalPriceColumn.setCellFactory(new DecimalFormatCellFactory<>(2));
 		
 		// Adding columns to the TableView
 		orderTableView.getColumns().addAll(Arrays.asList(itemNameColumn, itemPriceColumn, quantityColumn, totalPriceColumn));
