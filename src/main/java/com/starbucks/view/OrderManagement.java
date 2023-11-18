@@ -2,6 +2,9 @@ package com.starbucks.view;
 
 import java.util.Arrays;
 
+import com.starbucks.enums.Flavor;
+import com.starbucks.enums.Milk;
+import com.starbucks.enums.Size;
 import com.starbucks.model.Menu;
 import com.starbucks.model.MenuItem;
 import com.starbucks.model.Order;
@@ -17,12 +20,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -45,7 +53,6 @@ public class OrderManagement extends BaseView {
 	private TableView<MenuItem> menuTableView = new TableView<>();
 	private TableView<OrderItem> orderTableView = new TableView<>();
 
-	private TextField quantityTextField = new TextField("1"); // Default quantity is 1
 	private Label totalCostLabel = new Label("Total Cost: $0.00");
 	
 	private Button addButton;
@@ -93,7 +100,7 @@ public class OrderManagement extends BaseView {
 
 		root.setBottom(setupBottomButtonBox());
 
-		return new Scene(root, 600, 600);
+		return new Scene(root, 700, 600);
 	}
 
 	// Setup the table for displaying menu items
@@ -129,6 +136,11 @@ public class OrderManagement extends BaseView {
 				cellData -> new SimpleDoubleProperty(cellData.getValue().getMenuItem().getItemPrice()).asObject());
 		itemPriceColumn.setCellFactory(new DecimalFormatCellFactory<>(2));
 		
+		TableColumn<OrderItem, Double> customizationCostColumn = new TableColumn<>("Customization Cost");
+		customizationCostColumn.setCellValueFactory(
+				cellData -> new SimpleDoubleProperty(cellData.getValue().calculateCustomizationCost()).asObject());
+		customizationCostColumn.setCellFactory(new DecimalFormatCellFactory<>(2));
+
 		TableColumn<OrderItem, Integer> quantityColumn = new TableColumn<>("Quantity");
 		quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
@@ -138,7 +150,8 @@ public class OrderManagement extends BaseView {
 		totalPriceColumn.setCellFactory(new DecimalFormatCellFactory<>(2));
 		
 		// Adding columns to the TableView
-		orderTableView.getColumns().addAll(Arrays.asList(itemNameColumn, itemPriceColumn, quantityColumn, totalPriceColumn));
+		orderTableView.getColumns().addAll(Arrays.asList(itemNameColumn, itemPriceColumn, customizationCostColumn,
+				quantityColumn, totalPriceColumn));
 
 		// Populate the TableView with order items
 		orderTableView.setItems(FXCollections.observableArrayList(currentOrder.getOrderItems()));
@@ -152,9 +165,9 @@ public class OrderManagement extends BaseView {
 		addButton.setOnAction(e -> addToOrder());
 		addButton.setDisable(true); // Initially disabled
 
-		HBox addBox = new HBox(10, new Label("Quantity:"), quantityTextField, addButton);
-		addBox.setAlignment(Pos.CENTER);
-		return addBox;
+        HBox addBox = new HBox(10, addButton);
+        addBox.setAlignment(Pos.CENTER);
+        return addBox;
 	}
 	
 	private HBox setupTotalCostAndRemoveBox() {
@@ -188,20 +201,124 @@ public class OrderManagement extends BaseView {
 		MenuItem selectedMenuItem = menuTableView.getSelectionModel().getSelectedItem();
 		if (selectedMenuItem != null) {
 			try {
-				int quantity = Integer.parseInt(quantityTextField.getText());
-				OrderItem orderItem = new OrderItem(selectedMenuItem, quantity);
-				currentOrder.addOrderItem(orderItem);
-				orderTableView.setItems(FXCollections.observableArrayList(currentOrder.getOrderItems()));
-				updateTotalCost();
-				
+				showCustomizationDialog(selectedMenuItem);
+
 				// Enable the process order button
-                processOrderButton.setDisable(false);
+				processOrderButton.setDisable(false);
 			} catch (NumberFormatException ex) {
 				showAlert("Invalid Quantity", "Please enter a valid quantity.", Alert.AlertType.ERROR);
 			}
 		}
 	}
 	
+	private void showCustomizationDialog(MenuItem menuItem) {
+		Dialog<OrderItem> dialog = new Dialog<>();
+		dialog.setTitle("Customize Order");
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(20, 150, 10, 10));
+
+		ToggleGroup sizeGroup = new ToggleGroup();
+		HBox sizeOptions = createRadioButtonOptions(Size.values(), sizeGroup, "Size");
+
+		ToggleGroup flavorGroup = new ToggleGroup();
+		HBox flavorOptions = createRadioButtonOptions(Flavor.values(), flavorGroup, "Flavor");
+
+		ToggleGroup milkGroup = new ToggleGroup();
+		HBox milkOptions = createRadioButtonOptions(Milk.values(), milkGroup, "Milk");
+
+		TextField quantityField = new TextField("1");
+		quantityField.setPrefWidth(50);
+
+		Label totalCostLabel = new Label("Total Cost: $" + formatPrice(menuItem.getItemPrice()));
+		totalCostLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+
+		// Add options and Labels to the grid
+		grid.add(new Label("Size:"), 0, 0);
+		grid.add(sizeOptions, 1, 0);
+		grid.add(new Label("Flavor:"), 0, 1);
+		grid.add(flavorOptions, 1, 1);
+		grid.add(new Label("Milk type:"), 0, 2);
+		grid.add(milkOptions, 1, 2);
+		grid.add(new Label("Quantity:"), 0, 3);
+		grid.add(quantityField, 1, 3);
+		grid.add(totalCostLabel, 1, 4);
+
+		// Update total cost when selections change
+		sizeGroup.selectedToggleProperty().addListener((obs, oldVal, newVal) -> updateTotalCostLabel(menuItem,
+				sizeGroup, flavorGroup, milkGroup, totalCostLabel));
+		flavorGroup.selectedToggleProperty().addListener((obs, oldVal, newVal) -> updateTotalCostLabel(menuItem,
+				sizeGroup, flavorGroup, milkGroup, totalCostLabel));
+		milkGroup.selectedToggleProperty().addListener((obs, oldVal, newVal) -> updateTotalCostLabel(menuItem,
+				sizeGroup, flavorGroup, milkGroup, totalCostLabel));
+
+		DialogPane dialogPane = dialog.getDialogPane();
+		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+		Button addButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+		addButton.setText("Add");
+		styleButton(addButton);
+		styleButton((Button) dialogPane.lookupButton(ButtonType.CANCEL));
+		dialogPane.setContent(grid);
+
+		dialog.setResultConverter(dialogButton -> {
+			if (dialogButton == ButtonType.OK) {
+				int quantity = Integer.parseInt(quantityField.getText());
+				OrderItem orderItem = new OrderItem(menuItem, quantity);
+				orderItem.addCustomization("Size",
+						((Size) sizeGroup.getSelectedToggle().getUserData()).getAdditionalCost());
+				orderItem.addCustomization("Flavor",
+						((Flavor) flavorGroup.getSelectedToggle().getUserData()).getAdditionalCost());
+				orderItem.addCustomization("Milk",
+						((Milk) milkGroup.getSelectedToggle().getUserData()).getAdditionalCost());
+				return orderItem;
+			}
+			return null;
+		});
+
+		dialog.showAndWait().ifPresent(orderItem -> {
+			currentOrder.addOrderItem(orderItem);
+			orderTableView.setItems(FXCollections.observableArrayList(currentOrder.getOrderItems()));
+			updateTotalCost();
+		});
+	}
+
+	// Helper method to create radio button options (horizontal layout)
+	private HBox createRadioButtonOptions(Enum<?>[] options, ToggleGroup group, String category) {
+		HBox box = new HBox(10);
+		for (Enum<?> option : options) {
+			String label = option.toString();
+			if (option instanceof Size && ((Size) option).getAdditionalCost() != 0) {
+				label += " (" + ((Size) option).getAdditionalCost() + "$)";
+			} else if (option instanceof Flavor && ((Flavor) option).getAdditionalCost() != 0) {
+				label += " (" + ((Flavor) option).getAdditionalCost() + "$)";
+			} else if (option instanceof Milk && ((Milk) option).getAdditionalCost() != 0) {
+				label += " (" + ((Milk) option).getAdditionalCost() + "$)";
+			}
+			RadioButton rb = new RadioButton(label);
+			rb.setUserData(option);
+			rb.setToggleGroup(group);
+			if (category.equals("Size") && option.equals(Size.TALL)
+					|| category.equals("Flavor") && option.equals(Flavor.NONE)
+					|| category.equals("Milk") && option.equals(Milk.REGULAR)) {
+				rb.setSelected(true);
+			}
+			box.getChildren().add(rb);
+		}
+		return box;
+	}
+
+	private void updateTotalCostLabel(MenuItem menuItem, ToggleGroup size, ToggleGroup flavor, ToggleGroup milk,
+			Label label) {
+		Size selectedSize = (Size) size.getSelectedToggle().getUserData();
+		Flavor selectedFlavor = (Flavor) flavor.getSelectedToggle().getUserData();
+		Milk selectedMilk = (Milk) milk.getSelectedToggle().getUserData();
+
+		double totalCost = menuItem.getItemPrice() + selectedSize.getAdditionalCost()
+				+ selectedFlavor.getAdditionalCost() + selectedMilk.getAdditionalCost();
+		label.setText("Total Cost: $" + formatPrice(totalCost));
+	}
+
 	private void removeFromOrder() {
 		OrderItem selectedOrderItem = orderTableView.getSelectionModel().getSelectedItem();
 		if (selectedOrderItem != null) {

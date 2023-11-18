@@ -22,11 +22,14 @@ public class OrderProcessing extends BaseView {
 	// Store the current order
 	private final Order currentOrder;
 	
+	private final Scene orderManagementScene;
+	
 	private final OrderManagement orderManagement;
 
 	// Constructor to initialize the order processing
 	public OrderProcessing(Stage primaryStage, Order currentOrder, OrderManagement orderManagement) {
 		this.primaryStage = primaryStage;
+		this.orderManagementScene = primaryStage.getScene();
 		this.currentOrder = currentOrder;
 		this.orderManagement = orderManagement;
 	}
@@ -79,7 +82,7 @@ public class OrderProcessing extends BaseView {
 
 		// Create buttons for navigation and payment
 		Button backButton = styleButton(new Button("Back"));
-		backButton.setOnAction(e -> primaryStage.setScene(orderManagement.createOrderManagementScene()));
+		backButton.setOnAction(e -> primaryStage.setScene(orderManagementScene));
 
 		Button paymentButton = styleButton(new Button("Pay"));
 		paymentButton.setOnAction(e -> handlePayment());
