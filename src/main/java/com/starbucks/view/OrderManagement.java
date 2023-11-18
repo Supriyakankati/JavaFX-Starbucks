@@ -244,7 +244,8 @@ public class OrderManagement extends BaseView {
 	// Method to reset the order and TableView
 	public void resetOrderManagement() {
 		this.currentOrder = new Order(); // Reset the current order
-		orderTableView.setItems(FXCollections.observableArrayList(currentOrder.getOrderItems())); // Clear the TableView
+		menuTableView = new TableView<>();
+		orderTableView = new TableView<>();
 		updateTotalCost(); // Update the total cost label
 		processOrderButton.setDisable(true); // Disable the process order button
 	}
