@@ -1,5 +1,6 @@
 package com.starbucks.view;
 
+import java.util.Map;
 import com.starbucks.model.Order;
 import com.starbucks.model.OrderItem;
 
@@ -63,14 +64,50 @@ public class OrderProcessing extends BaseView {
 
 		int row = 0;
 		for (OrderItem item : currentOrder.getOrderItems()) {
-			String formattedItemPrice = formatPrice(item.getMenuItem().getItemPrice());
-			String formattedTotalPrice = formatPrice(item.calculateItemPrice());
+			// Bold Label for item name, price, and quantity
+			Label itemNameLabel = new Label(item.getMenuItem().getItemName());
+			itemNameLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+			Label itemPriceLabel = new Label("$" + formatPrice(item.getMenuItem().getItemPrice()));
+			itemPriceLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+			Label itemQuantityLabel = new Label("x" + item.getQuantity());
+			itemQuantityLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
 
-			orderItemsGrid.add(new Label(item.getMenuItem().getItemName()), 0, row);
-			orderItemsGrid.add(new Label("$" + formattedItemPrice), 1, row);
-			orderItemsGrid.add(new Label("x" + item.getQuantity()), 2, row);
-			orderItemsGrid.add(new Label("= $" + formattedTotalPrice), 3, row);
-			row++;
+			orderItemsGrid.add(itemNameLabel, 0, row);
+			orderItemsGrid.add(itemPriceLabel, 1, row);
+			orderItemsGrid.add(itemQuantityLabel, 2, row);
+
+			// Customizations line with indentation
+			StringBuilder customizationsText = new StringBuilder();
+			for (Map.Entry<String, Double> entry : item.getCustomizations().entrySet()) {
+				if (customizationsText.length() > 0) {
+					customizationsText.append(", ");
+				}
+				customizationsText.append(entry.getKey());
+				if (entry.getValue() > 0) {
+					customizationsText.append(" ($").append(formatPrice(entry.getValue())).append(")");
+				}
+			}
+
+			if (customizationsText.length() > 0) {
+				customizationsText.insert(0, "\t"); // Add indentation
+			}
+
+			double customizationsCost = item.calculateCustomizationCost();
+		    if (customizationsCost > 0) {
+		        customizationsText.append(" > $").append(formatPrice(customizationsCost));
+		    }
+		    
+		    Label customizationsLabel = new Label(customizationsText.toString());
+		    customizationsLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
+		    
+			String formattedTotalPrice = formatPrice(item.calculateItemPrice());
+			Label totalPriceLabel = new Label("\t= $" + formattedTotalPrice);
+			totalPriceLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+
+			orderItemsGrid.add(customizationsLabel, 0, row + 1, 3, 1);
+			orderItemsGrid.add(totalPriceLabel, 3, row + 1);
+
+			row += 2; // Increment by 2 for each item due to the additional customization line
 		}
 
 		scrollPane.setContent(orderItemsGrid);

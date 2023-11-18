@@ -265,12 +265,21 @@ public class OrderManagement extends BaseView {
 			if (dialogButton == ButtonType.OK) {
 				int quantity = Integer.parseInt(quantityField.getText());
 				OrderItem orderItem = new OrderItem(menuItem, quantity);
-				orderItem.addCustomization("Size",
-						((Size) sizeGroup.getSelectedToggle().getUserData()).getAdditionalCost());
-				orderItem.addCustomization("Flavor",
-						((Flavor) flavorGroup.getSelectedToggle().getUserData()).getAdditionalCost());
-				orderItem.addCustomization("Milk",
-						((Milk) milkGroup.getSelectedToggle().getUserData()).getAdditionalCost());
+
+				// Add Size customization
+				Size selectedSize = (Size) sizeGroup.getSelectedToggle().getUserData();
+				orderItem.addCustomization(selectedSize.getLabel(), selectedSize.getAdditionalCost());
+				
+				// Add Milk customization
+				Milk selectedMilk = (Milk) milkGroup.getSelectedToggle().getUserData();
+				orderItem.addCustomization(selectedMilk.getLabel(), selectedMilk.getAdditionalCost());
+
+				// Add Flavor customization if it's not None
+				Flavor selectedFlavor = (Flavor) flavorGroup.getSelectedToggle().getUserData();
+				if (selectedFlavor != Flavor.NONE) {
+					orderItem.addCustomization(selectedFlavor.getLabel(), selectedFlavor.getAdditionalCost());
+				}
+
 				return orderItem;
 			}
 			return null;

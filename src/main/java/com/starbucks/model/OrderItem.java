@@ -1,6 +1,6 @@
 package com.starbucks.model;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -14,7 +14,7 @@ public class OrderItem {
 	public OrderItem(MenuItem menuItem, int quantity) {
 		this.menuItem = Objects.requireNonNull(menuItem, "MenuItem cannot be null");
 		this.quantity = quantity;
-		this.customizations = new HashMap<>();
+		this.customizations = new LinkedHashMap<>();
 	}
 
 	// Get the base menu item
