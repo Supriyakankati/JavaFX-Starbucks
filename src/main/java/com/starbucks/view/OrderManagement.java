@@ -50,6 +50,7 @@ public class OrderManagement extends BaseView {
 	
 	private Button addButton;
 	private Button removeButton;
+	private Button processOrderButton;
 
 	// Constructor to initialize the order management
 	public OrderManagement(Stage primaryStage, Menu menu) {
@@ -167,8 +168,9 @@ public class OrderManagement extends BaseView {
 	}
 	
 	private HBox setupBottomButtonBox() {
-		Button processOrderButton = styleButton(new Button("Process Order"));
+		processOrderButton = styleButton(new Button("Process Order"));
 		processOrderButton.setOnAction(e -> processOrder());
+		processOrderButton.setDisable(true); // Initially disabled
 
 		Button cancelButton = styleButton(new Button("Cancel Order"));
 		cancelButton.setOnAction(e -> cancelOrder());
@@ -191,6 +193,9 @@ public class OrderManagement extends BaseView {
 				currentOrder.addOrderItem(orderItem);
 				orderTableView.setItems(FXCollections.observableArrayList(currentOrder.getOrderItems()));
 				updateTotalCost();
+				
+				// Enable the process order button
+                processOrderButton.setDisable(false);
 			} catch (NumberFormatException ex) {
 				showAlert("Invalid Quantity", "Please enter a valid quantity.", Alert.AlertType.ERROR);
 			}
@@ -203,6 +208,9 @@ public class OrderManagement extends BaseView {
 			currentOrder.removeOrderItem(selectedOrderItem);
 			orderTableView.setItems(FXCollections.observableArrayList(currentOrder.getOrderItems()));
 			updateTotalCost();
+			
+			// Disable the process order button if the order is empty
+            processOrderButton.setDisable(currentOrder.getOrderItems().isEmpty());
 		}
 	}
 
@@ -226,6 +234,9 @@ public class OrderManagement extends BaseView {
 				currentOrder = new Order();
 				orderTableView.setItems(FXCollections.observableArrayList(currentOrder.getOrderItems()));
 				updateTotalCost();
+				
+				// Disable the process order button if the order is empty
+	            processOrderButton.setDisable(currentOrder.getOrderItems().isEmpty());
 			}
 		});
 	}
