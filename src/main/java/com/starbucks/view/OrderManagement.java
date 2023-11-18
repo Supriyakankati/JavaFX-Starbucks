@@ -212,7 +212,9 @@ public class OrderManagement extends BaseView {
 	}
 
 	private void processOrder() {
-		// TODO: Navigate to another scene for order processing
+		OrderProcessing orderProcessing = new OrderProcessing(primaryStage, currentOrder);
+		Scene orderProcessingScene = orderProcessing.createOrderProcessingScene();
+		primaryStage.setScene(orderProcessingScene);
 	}
 
 	private void cancelOrder() {
