@@ -5,11 +5,22 @@ import java.util.List;
 import java.util.Objects;
 
 public class Menu {
+	// The single instance of the Menu class
+	private static Menu instance; 
+	
 	private List<MenuItem> items;
 
-	// Constructor to initialize an empty menu
-	public Menu() {
+	// Private constructor to prevent instantiation from other classes
+	private Menu() {
 		this.items = new ArrayList<>();
+	}
+
+	// Public method to get the instance of the Menu
+	public static Menu getInstance() {
+		if (instance == null) {
+			instance = new Menu();
+		}
+		return instance;
 	}
 
 	// Add a MenuItem to the menu
