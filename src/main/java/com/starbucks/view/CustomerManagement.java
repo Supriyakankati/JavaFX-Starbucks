@@ -54,7 +54,7 @@ public class CustomerManagement extends BaseView {
 		newUserLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
 		Button registerButton = styleButton(new Button("Register"));
 		registerButton.setPrefSize(150, 50);
-		// TODO: Add action for registration here
+		registerButton.setOnAction(e -> showRegisterHandlerView());
 		registerBox.getChildren().addAll(newUserLabel, registerButton);
 		registerBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -93,5 +93,12 @@ public class CustomerManagement extends BaseView {
 		OrderManagement orderManagement = new OrderManagement(primaryStage);
 		Scene orderManagementScene = orderManagement.createOrderManagementScene();
 		primaryStage.setScene(orderManagementScene);
+	}
+	
+	// Displays the register handler view of the application
+	private void showRegisterHandlerView() {
+		RegisterHandler registerHandler = new RegisterHandler(primaryStage);
+		Scene registerHandlerScene = registerHandler.createRegisterScene();
+		primaryStage.setScene(registerHandlerScene);
 	}
 }
