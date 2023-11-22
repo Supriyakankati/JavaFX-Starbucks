@@ -39,10 +39,10 @@ public class MenuManagement extends BaseView {
 	private MenuItem selectedItem;
 
 	// Constructor to initialize the menu management
-	public MenuManagement(Stage primaryStage, Menu menu) {
+	public MenuManagement(Stage primaryStage) {
 		this.primaryStage = primaryStage;
 		this.mainScene = primaryStage.getScene();
-		this.menu = menu;
+		this.menu = Menu.getInstance();
 	}
 
 	// Creates and returns the scene for menu management

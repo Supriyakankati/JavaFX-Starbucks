@@ -2,6 +2,7 @@ package com.starbucks.application;
 
 import com.starbucks.model.Menu;
 import com.starbucks.model.MenuItem;
+import com.starbucks.view.CustomerManagement;
 import com.starbucks.view.MenuManagement;
 import com.starbucks.view.OrderManagement;
 
@@ -24,7 +25,7 @@ public class Main extends Application {
 	private Stage primaryStage;
 	
 	// Menu containing all the items
-	private Menu menu = new Menu();
+	private Menu menu;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -44,7 +45,7 @@ public class Main extends Application {
 
 		Button customerButton = styleButton(new Button("CUSTOMER"));
 		customerButton.setPrefSize(150, 50);
-		customerButton.setOnAction(e -> showOrderManagementView());
+		customerButton.setOnAction(e -> showCustomerManagementView());
 
 		HBox hBox = new HBox(10);
 		hBox.setAlignment(Pos.CENTER);
@@ -58,15 +59,16 @@ public class Main extends Application {
 
 	// Displays the menu management view of the application
 	private void showMenuManagementView() {
-		MenuManagement menuManagement = new MenuManagement(primaryStage, menu);
+		MenuManagement menuManagement = new MenuManagement(primaryStage);
 		Scene menuManagementScene = menuManagement.createMenuManagementScene();
 		primaryStage.setScene(menuManagementScene);
 	}
 	
-	private void showOrderManagementView() {
-		OrderManagement orderManagement = new OrderManagement(primaryStage, menu);
-		Scene orderManagementScene = orderManagement.createOrderManagementScene();
-		primaryStage.setScene(orderManagementScene);
+	// Displays the customer management view of the application
+	private void showCustomerManagementView() {
+		CustomerManagement customerManagement = new CustomerManagement(primaryStage);
+		Scene customerManagementScene = customerManagement.createCustomerScene();
+		primaryStage.setScene(customerManagementScene);
 	}
 
 	// Sets the background color, text color, font, and size of the button
@@ -90,6 +92,7 @@ public class Main extends Application {
 	}
 	
 	private void initializeMenuWithData() {
+		this.menu = Menu.getInstance();
         menu.addItem(new MenuItem("Caffè Americano", 2.95, "Espresso shots topped with hot water for a rich, creamy flavor."));
         menu.addItem(new MenuItem("Caffè Mocha", 3.45, "Espresso with bittersweet mocha sauce and steamed milk."));
         menu.addItem(new MenuItem("Cappuccino", 2.95, "Dark, rich espresso under a smoothed and stretched layer of thick milk foam."));

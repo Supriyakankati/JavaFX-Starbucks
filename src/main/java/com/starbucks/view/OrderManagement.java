@@ -60,10 +60,10 @@ public class OrderManagement extends BaseView {
 	private Button processOrderButton;
 
 	// Constructor to initialize the order management
-	public OrderManagement(Stage primaryStage, Menu menu) {
+	public OrderManagement(Stage primaryStage) {
 		this.primaryStage = primaryStage;
 		this.mainScene = primaryStage.getScene();
-		this.menu = menu;
+		this.menu = Menu.getInstance();
 	}
 
 	// Creates and returns the scene for order management
