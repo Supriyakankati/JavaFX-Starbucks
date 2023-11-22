@@ -10,6 +10,7 @@ import com.starbucks.model.MenuItem;
 import com.starbucks.model.Order;
 import com.starbucks.model.OrderItem;
 import com.starbucks.utils.DecimalFormatCellFactory;
+import com.starbucks.utils.UserManagement;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -189,7 +190,7 @@ public class OrderManagement extends BaseView {
 		cancelButton.setOnAction(e -> cancelOrder());
 
 		Button backButton = styleButton(new Button("Back"));
-		backButton.setOnAction(e -> primaryStage.setScene(mainScene));
+		backButton.setOnAction(e -> goBack());
 
 		HBox bottomBox = new HBox(10, processOrderButton, cancelButton, backButton);
 		bottomBox.setAlignment(Pos.CENTER);
@@ -380,5 +381,11 @@ public class OrderManagement extends BaseView {
 		Label label = new Label(text);
 		label.setFont(Font.font("Arial", FontWeight.BOLD, 18));
 		return label;
+	}
+	
+	// Handle back navigation to CustomerManagement
+	private void goBack() {
+		UserManagement.getInstance().logout();
+		primaryStage.setScene(mainScene);
 	}
 }

@@ -1,9 +1,15 @@
 package com.starbucks.view;
 
+import java.io.IOException;
+
+import com.starbucks.model.User;
+import com.starbucks.utils.UserManagement;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -21,11 +27,13 @@ public class CustomerManagement extends BaseView {
 	private final Stage primaryStage;
 	private final Scene mainScene;
 
+	// Constructor
 	public CustomerManagement(Stage primaryStage) {
 		this.primaryStage = primaryStage;
 		this.mainScene = primaryStage.getScene();
 	}
 
+	// Creates and returns the scene for Customer management
 	public Scene createCustomerScene() {
 		BorderPane borderPane = new BorderPane();
 
@@ -48,6 +56,7 @@ public class CustomerManagement extends BaseView {
 
 		Button loginButton = styleButton(new Button("Login"));
 		loginButton.setPrefSize(150, 50);
+		loginButton.setOnAction(e -> handleLogin(usernameField, passwordField));
 
 		VBox registerBox = new VBox();
 		Label newUserLabel = new Label("New User?");
@@ -100,5 +109,24 @@ public class CustomerManagement extends BaseView {
 		RegisterHandler registerHandler = new RegisterHandler(primaryStage);
 		Scene registerHandlerScene = registerHandler.createRegisterScene();
 		primaryStage.setScene(registerHandlerScene);
+	}
+	
+	// Handles the login process
+	private void handleLogin(TextField usernameField, PasswordField passwordField) {
+		String username = usernameField.getText();
+		String password = passwordField.getText();
+
+		try {
+			UserManagement userManagement = UserManagement.getInstance();
+			User user = userManagement.authenticateUser(username, password);
+			if (user != null) {
+				// User authenticated, proceed to OrderManagement
+				showOrderManagementView();
+			} else {
+				showAlert("Login Failed", "Invalid username or password.", AlertType.ERROR);
+			}
+		} catch (IOException ex) {
+			showAlert("Error", "Failed to read user data: " + ex.getMessage(), AlertType.ERROR);
+		}
 	}
 }

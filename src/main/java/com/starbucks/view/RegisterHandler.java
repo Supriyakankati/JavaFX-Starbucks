@@ -27,7 +27,7 @@ public class RegisterHandler extends BaseView {
 	public RegisterHandler(Stage primaryStage) {
 		this.primaryStage = primaryStage;
 		this.customerScene = primaryStage.getScene();
-		this.userManagement = new UserManagement();
+		this.userManagement = UserManagement.getInstance();
 	}
 
 	// Creates and returns the scene for Register handler
