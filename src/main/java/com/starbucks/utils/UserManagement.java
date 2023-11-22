@@ -49,6 +49,30 @@ public class UserManagement {
 			return reader.lines().map(this::parseUser).collect(Collectors.toList());
 		}
 	}
+	
+	// Update a specific user in the users.txt file
+	public void updateUser(User updatedUser) throws IOException {
+		List<User> users = readUsers();
+		for (int i = 0; i < users.size(); i++) {
+			if (users.get(i).getUsername().equals(updatedUser.getUsername())) {
+				users.set(i, updatedUser);
+				break;
+			}
+		}
+		writeUsersToFile(users);
+	}
+
+	// Helper method to write a list of users to the users.txt file
+	private void writeUsersToFile(List<User> users) throws IOException {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(USERS_FILE))) {
+			for (User user : users) {
+				String userRecord = user.getUsername() + ";" + user.getPassword() + ";" + user.getBalance();
+				writer.write(userRecord);
+				writer.newLine();
+			}
+		}
+	}
+
 
 	// Authenticate a user by username and password
 	public User authenticateUser(String username, String password) throws IOException {
